@@ -1,0 +1,33 @@
+{
+	"name": "aiota-session",
+	"version": "0.0.1",
+	"description": "AIoTA Session Provisioning Worker",
+	"main": "register.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/aiota/session.git"
+	},
+	"author": "Arthur Viegers <arthur@mongodb.com>",
+	"contributors": [
+		{
+			"name": [ "AIoTA Team" ],
+			"email": [ "arthur@mongodb.com", "pattyn.kurt@gmail.com" ]
+		}
+	],
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/aiota/session/LICENSE"
+		}
+	],
+  	"dependencies": {
+		"aiota-utils": ">=0.0.1",
+		"amqp": ">=0.2.0",
+		"crypto": ">=0.0.3",
+		"jsonschema": ">=1.0.0",
+		"mongodb": ">=1.4.10"
+	},
+	"bugs": {
+		"url": "https://github.com/iota/issues"
+	}
+}
