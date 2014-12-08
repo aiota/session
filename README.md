@@ -1,4 +1,4 @@
 server
 ======
 
-AIoTA Session Token Worker
+AIoTA Session Token Process

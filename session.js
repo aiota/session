@@ -40,7 +40,7 @@ function createDeviceResponse(db, header, payload, callback)
 		var resendTimeout = 10000;
 		var resendAfter = now + resendTimeout;
 		
-		var obj = { deviceId: header.deviceId, appId: header.tokencardId, requestId: header.requestId, action: "response", params: payload, status: 0, createdAt: now, timeoutAt: timeout, progress: [ { timestamp: now, status: "created" } ], resends: { numResends: 0, maxResends: maxResends, resendAfter: resendAfter, resendTimeout: resendTimeout } };
+		var obj = { deviceId: header.deviceId, encryption: header.encryption, requestId: header.requestId, action: "response", params: payload, status: 0, createdAt: now, timeoutAt: timeout, progress: [ { timestamp: now, status: "created" } ], resends: { numResends: 0, maxResends: maxResends, resendAfter: resendAfter, resendTimeout: resendTimeout } };
 		
 		collection.insert(obj, function(err, result) {
 			if (err) {
@@ -80,15 +80,15 @@ function handleNewSession(db, msg, callback)
 				}
 
 				if (device && device.hasOwnProperty("apps")) {
-					if (device.apps.hasOwnProperty(msg.header.tokencardId)) {
-						if (device.apps[msg.header.tokencardId].hasOwnProperty("status")) {
-							if (device.apps[msg.header.tokencardId].status == "registered") {
+					if (device.apps.hasOwnProperty(msg.header.encryption.tokencardId)) {
+						if (device.apps[msg.header.encryption.tokencardId].hasOwnProperty("status")) {
+							if (device.apps[msg.header.encryption.tokencardId].status == "registered") {
 								var set = {};
 				
 								var token = randomKey(24);
 								var timeoutAt = (msg.body.timeout > 0 ? Date.now() + (msg.body.timeout * 1000) : 0);
 												
-								set["apps." + msg.header.tokencardId + ".session"] = { id: token, timeoutAt: timeoutAt };
+								set["apps." + msg.header.encryption.tokencardId + ".session"] = { id: token, timeoutAt: timeoutAt };
 					
 								collection.update({ _id: msg.header.deviceId }, { $set: set }, function(err, result) {
 									if (err) {
@@ -135,7 +135,14 @@ function handleSessionRequest(db, msg, callback)
 					type: { type: "string", enum: [ "session" ], required: true },
 					timestamp: { type: "integer", minimum: 0, required: true },
 					ttl: { type: "integer", minimum: 0, required: true },
-					tokencardId: { type: "string", required: true },
+					encryption: {
+						type: "object",
+						properties: {
+							method: { type: "string", required: true },
+							tokencardId: { type: "string", required: true }
+						},
+						required: true
+					}
 				},
 				required: true
 			},
@@ -156,7 +163,7 @@ function handleSessionRequest(db, msg, callback)
 				return;
 			}
 			
-			collection.findOne({ _id: msg.header.tokencardId }, { _id: 0, name: 1, version: 1 }, function(err, app) {
+			collection.findOne({ _id: msg.header.encryption.tokencardId }, { _id: 0, name: 1, version: 1 }, function(err, app) {
 				if (err) {
 					callback({ error: err, errorCode: 200002 });
 					return;
