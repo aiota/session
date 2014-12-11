@@ -1,5 +1,5 @@
 {
-	"processName": "response.js",
+	"processName": "session.js",
 	"serverName": "localhost",
 	"database": {
 		"host": "localhost",
