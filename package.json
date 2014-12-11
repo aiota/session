@@ -1,6 +1,6 @@
 {
 	"name": "aiota-session",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "AIoTA Session Provisioning Worker",
 	"main": "register.js",
 	"repository": {
