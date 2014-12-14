@@ -231,8 +231,6 @@ MongoClient.connect("mongodb://" + config.database.host + ":" + config.database.
 		aiota.log(config.processName, config.serverName, aiotaDB, err);
 	}
 	else {
-		aiota.processHeartbeat(config.processName, config.serverName, aiotaDB);
-		
 		MongoClient.connect("mongodb://" + config.database.host + ":" + config.database.port + "/" + config.database.name, function(err, db) {
 			if (err) {
 				aiota.log(config.processName, config.serverName, aiotaDB, err);
@@ -251,7 +249,7 @@ MongoClient.connect("mongodb://" + config.database.host + ":" + config.database.
 					});
 				});
 
-				setInterval(function() { aiota.processHeartbeat(config.processName, config.serverName, aiotaDB); }, 10000);
+				setInterval(function() { aiota.heartbeat(config.processName, config.serverName, aiotaDB); }, 10000);
 
 				process.on("SIGTERM", function() {
 					aiota.terminateProcess(config.processName, config.serverName, db, function() {
