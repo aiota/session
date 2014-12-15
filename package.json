@@ -1,6 +1,6 @@
 {
 	"name": "aiota-session",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"description": "AiotA Session Provisioning Micro Process",
 	"main": "register.js",
 	"repository": {
