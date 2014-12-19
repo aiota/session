@@ -1,4 +1,4 @@
 server
 ======
 
-AiotA Session Token Process
+AiotA Session Token Micro Process

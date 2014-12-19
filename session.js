@@ -32,7 +32,7 @@ function createDeviceResponse(db, header, payload, callback)
 {
 	db.collection("actions", function(err, collection) {
 		if (err) {
-			callback({ error: err });
+			callback({ error: err, errorCode: 200001 });
 			return;
 		}
 
@@ -46,13 +46,28 @@ function createDeviceResponse(db, header, payload, callback)
 		
 		collection.insert(obj, function(err, result) {
 			if (err) {
-				reply = { error: err, errorCode: 200003 };
-			}
-			else {
-				reply = payload;
+				callback({ error: err, errorCode: 200003 });
+				return;
+				
 			}
 			
-			callback(reply);
+			db.collection("push_actions", function(err, collection) {
+				if (err) {
+					callback({ error: err, errorCode: 200001 });
+					return;
+				}
+		
+				collection.insert(obj, function(err, result) {
+					if (err) {
+						reply = { error: err, errorCode: 200003 };
+					}
+					else {
+						reply = payload;
+					}
+					
+					callback(reply);
+				});
+			});
 		});
 	});
 }
