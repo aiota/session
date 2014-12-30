@@ -1,11 +1,11 @@
 var aiota = require("aiota-utils");
+var path = require("path");
 var amqp = require("amqp");
 var crypto = require("crypto");
 var jsonValidate = require("jsonschema").validate;
 var MongoClient = require("mongodb").MongoClient;
 
 var config = null;
-var processName = "session.js";
 
 function randomKey(len, chars)
 {
@@ -247,19 +247,19 @@ var args = process.argv.slice(2);
  
 MongoClient.connect("mongodb://" + args[0] + ":" + args[1] + "/" + args[2], function(err, aiotaDB) {
 	if (err) {
-		aiota.log(processName, "", null, err);
+		aiota.log(path.basename(__filename), "", null, err);
 	}
 	else {
 		aiota.getConfig(aiotaDB, function(c) {
 			if (c == null) {
-				aiota.log(processName, "", aiotaDB, "Error getting config from database");
+				aiota.log(path.basename(__filename), "", aiotaDB, "Error getting config from database");
 			}
 			else {
 				config = c;
 
 				MongoClient.connect("mongodb://" + config.database.host + ":" + config.ports.mongodb + "/" + config.database.name, function(err, db) {
 					if (err) {
-						aiota.log(processName, config.serverName, aiotaDB, err);
+						aiota.log(path.basename(__filename), config.server, aiotaDB, err);
 					}
 					else {
 						var bus = amqp.createConnection(config.amqp);
@@ -275,10 +275,10 @@ MongoClient.connect("mongodb://" + args[0] + ":" + args[1] + "/" + args[2], func
 							});
 						});
 		
-						setInterval(function() { aiota.heartbeat(processName, config.serverName, aiotaDB); }, 10000);
+						setInterval(function() { aiota.heartbeat(path.basename(__filename), config.server, aiotaDB); }, 10000);
 		
 						process.on("SIGTERM", function() {
-							aiota.terminateProcess(processName, config.serverName, aiotaDB, function() {
+							aiota.terminateProcess(path.basename(__filename), config.server, aiotaDB, function() {
 								process.exit(1);
 							});
 						});
