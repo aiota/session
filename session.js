@@ -55,7 +55,7 @@ function createDeviceResponse(db, header, payload, callback)
 			
 			if (busReady) {
 				bus.queue("push:" + header.deviceId + "@" + header.encryption.tokencardId, { autoDelete: true, durable: false }, function(queue) {
-					bus.publish("push:" + header.deviceId + "@" + header.encryption.tokencardId, { push: "test" }, { deliveryMode: 2 });
+					bus.publish("push:" + header.deviceId + "@" + header.encryption.tokencardId, { push: Date.now() }, { deliveryMode: 2 });
 					callback(payload);
 				});
 			}
