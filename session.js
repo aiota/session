@@ -6,6 +6,7 @@ var jsonValidate = require("jsonschema").validate;
 var MongoClient = require("mongodb").MongoClient;
 
 var config = null;
+var bus = null;
 
 function randomKey(len, chars)
 {
@@ -51,23 +52,11 @@ function createDeviceResponse(db, header, payload, callback)
 				
 			}
 			
-			db.collection("push_actions", function(err, collection) {
-				if (err) {
-					callback({ error: err, errorCode: 200001 });
-					return;
-				}
-		
-				collection.insert(obj, function(err, result) {
-					if (err) {
-						reply = { error: err, errorCode: 200003 };
-					}
-					else {
-						reply = payload;
-					}
-					
-					callback(reply);
+			if (bus) {
+				bus.queue("push:" + header.deviceId + "@" + header.encryption.tokencardId, { autoDelete: true, durable: false }, function(queue) {
+					bus.publish("push:" + header.deviceId + "@" + header.encryption.tokencardId, { push: "test" }, { deliveryMode: 2 });
 				});
-			});
+			}
 		});
 	});
 }
@@ -262,7 +251,7 @@ MongoClient.connect("mongodb://" + args[0] + ":" + args[1] + "/" + args[2], func
 						aiota.log(path.basename(__filename), config.server, aiotaDB, err);
 					}
 					else {
-						var bus = amqp.createConnection(config.amqp);
+						bus = amqp.createConnection(config.amqp);
 						
 						bus.on("ready", function() {
 							var cl = { group: "system", type: "session" };
