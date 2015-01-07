@@ -259,7 +259,7 @@ MongoClient.connect("mongodb://" + args[0] + ":" + args[1] + "/" + args[2], func
 						bus = amqp.createConnection(config.amqp);
 						
 						bus.on("ready", function() {
-							busready = true;
+							busReady = true;
 							var cl = { group: "system", type: "session" };
 							bus.queue(aiota.getQueue(cl), { autoDelete: false, durable: true }, function(queue) {
 								queue.subscribe({ ack: true, prefetchCount: 1 }, function(msg) {
