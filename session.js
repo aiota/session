@@ -7,6 +7,7 @@ var MongoClient = require("mongodb").MongoClient;
 
 var config = null;
 var bus = null;
+var busReady = false;
 
 function randomKey(len, chars)
 {
@@ -52,10 +53,14 @@ function createDeviceResponse(db, header, payload, callback)
 				
 			}
 			
-			if (bus) {
+			if (busReady) {
 				bus.queue("push:" + header.deviceId + "@" + header.encryption.tokencardId, { autoDelete: true, durable: false }, function(queue) {
 					bus.publish("push:" + header.deviceId + "@" + header.encryption.tokencardId, { push: "test" }, { deliveryMode: 2 });
+					callback(payload);
 				});
+			}
+			else {
+				callback(payload);
 			}
 		});
 	});
@@ -254,6 +259,7 @@ MongoClient.connect("mongodb://" + args[0] + ":" + args[1] + "/" + args[2], func
 						bus = amqp.createConnection(config.amqp);
 						
 						bus.on("ready", function() {
+							busready = true;
 							var cl = { group: "system", type: "session" };
 							bus.queue(aiota.getQueue(cl), { autoDelete: false, durable: true }, function(queue) {
 								queue.subscribe({ ack: true, prefetchCount: 1 }, function(msg) {
